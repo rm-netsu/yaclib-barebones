@@ -33,7 +33,7 @@ Usage:
 ```
 Attributes:
 - url: current page url used if omitted
-- correction: error correction level (L|M|Q|H), M used if omitted
+- correction: error correction level (L/M/Q/H), M used if omitted
 - margin: relative margin size (empty space around qr code), 1 used if omitted
 - cellsize: relative cell size (black and white dots in qr code), 1 used if omitted
 
