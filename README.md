@@ -20,14 +20,22 @@ Import:
 
 Usage:
 ```html
+<!-- minimal, contains url of the page where placed -->
+<yac-qrcode></yac-qrcode>
+
 <yac-qrcode
-  url='https://developer.mozilla.org/en-US/docs/Web/HTML' <!-- current page url used if omitted -->
-  correction='M' <!-- error correction level, M used if omitted -->
-  margin='1' <!-- relative margin size (empty space around qr code), 1 used if omitted -->
-  cellsize='1' <!-- relative cell size (black and white dots in qr code), 1 used if omitted -->
+  url='https://developer.mozilla.org/en-US/docs/Web/HTML'
+  correction='H'
+  margin='2'
+  cellsize='1'
 >
 </yac-qrcode>
 ```
+Attributes:
+- url: current page url used if omitted
+- correction: error correction level (L|M|Q|H), M used if omitted
+- margin: relative margin size (empty space around qr code), 1 used if omitted
+- cellsize: relative cell size (black and white dots in qr code), 1 used if omitted
 
 Dot shape can be customized by providing a js function in `cellfn` attribute.
 
