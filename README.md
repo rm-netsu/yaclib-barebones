@@ -24,10 +24,10 @@ Usage:
 <yac-qrcode></yac-qrcode>
 
 <yac-qrcode
-  url='https://developer.mozilla.org/en-US/docs/Web/HTML'
-  correction='H'
-  margin='2'
-  cellsize='1'
+	url='https://developer.mozilla.org/en-US/docs/Web/HTML'
+	correction='H'
+	margin='2'
+	cellsize='1'
 >
 </yac-qrcode>
 ```
