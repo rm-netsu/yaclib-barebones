@@ -1,0 +1,5 @@
+{
+	"imports": {
+		"qrcode-generator-es6": "https://unpkg.com/qrcode-generator-es6@1.1.4/index.js"
+	}
+}

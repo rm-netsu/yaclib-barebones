@@ -2,7 +2,7 @@
 YACLib (Yet Another Component Library) web component prototypes in pure ES6 modules.
 To be rewritten in TypeScript later.
 
-To use on your page, put a `<script type="importmap"> ... </script>` tag with contents of the file [index.importmap](https://raw.githubusercontent.com/rm-netsu/yaclib-barebones/refs/heads/main/index.importmap) inside `<head>` tag of your page.
+To use on your page, put a `<script type="importmap"> ... </script>` tag with contents of the file [importmap.json](https://raw.githubusercontent.com/rm-netsu/yaclib-barebones/refs/heads/main/importmap.json) inside `<head>` tag of your page.
 
 _Below_ the importmap tag add `<script type="module" src=" ... "></script>` tags with the components you want to use.
 
