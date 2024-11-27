@@ -30,7 +30,14 @@ export const circleFn = (x, y, c) => `<circle
 />`
 
 const sheet = new CSSStyleSheet()
-sheet.replaceSync('SVG { display: block; }')
+sheet.replaceSync(
+`.wrap { position: relative; }
+SVG { display: block; }
+.bg {
+	background: --var(bg, white);
+	position: absolute; left: 0; top: 0; bottom: 0; right: 0; z-index: -1;
+}`
+)
 
 const defaults = {
 	margin: 1,
@@ -39,6 +46,12 @@ const defaults = {
 	correction: 'M',
 	cellfn: squareFn,
 }
+
+const template = modules =>
+`<div class='wrap'>
+<slot name='background'><div class='bg'></div></slot>
+${modules}
+</div>`
 
 export default class HTMLQrCodeElement extends HTMLElement {
 	static observedAttributes = ['margin', 'cellsize', 'url', 'correction', 'cellfn']
@@ -96,11 +109,11 @@ export default class HTMLQrCodeElement extends HTMLElement {
 			xmlns:xlink="http://www.w3.org/1999/xlink"
 			viewBox="0 0 ${sideLength} ${sideLength}"
 			preserveAspectRatio="xMinYMin meet"
-		><rect width="100%" height="100%" fill="white" x="0" y="0" />${
+		>${
 			cells.join('')
 		}</svg>`
 		
-		this.shadowRoot.innerHTML = svg
+		this.shadowRoot.innerHTML = template(svg)
 	}
 }
 customElements.define('yac-qrcode', HTMLQrCodeElement)
