@@ -43,4 +43,5 @@ Currently available components:
 
 ---
 ## QR code
-![./qrcode/index.md]
+{% include_relative qrcode/index.md %}
+[![./qrcode/index.md]](https://github.com/rm-netsu/yaclib-barebones/blob/9ad32124368876eb1b8299da683fb252ad5e4ebd/qrcode/index.md)
