@@ -1,42 +1,16 @@
-/*
-<yac-qrcode
-	url={string}
-	correction={'H'|'M'|'L'}
-	margin={number}
-	cellsize={number}>
-	cellfn={(x, y, c) => `<svg-element ... />`}
-</yac-qrcode>
-*/
-
 import qrcode from 'qrcode-generator-es6'
+import * as moduleFn from './module-fn.js'
 
-/** Sample function for square cells */
-export const squareFn = (x, y, c) => `<rect
-	width="${c}"
-	height="${c}"
-	x="${x}"
-	y="${y}"
-	fill="black"
-	shape-rendering="crispEdges"
-/>`
-
-/** Sample function for circle cells */
-export const circleFn = (x, y, c) => `<circle
-	r="${c/2}"
-	cx="${x +c/2}"
-	cy="${y +c/2}"
-	fill="black"
-	shape-rendering="crispEdges"
-/>`
 
 const sheet = new CSSStyleSheet()
-sheet.replaceSync(
-`.wrap { position: relative; }
-SVG { display: block; }
+sheet.replaceSync(//css
+`SVG { display: block; }
+.wrap { position: relative; }
 .bg {
 	background: var(--bg, white);
 	position: absolute; left: 0; top: 0; bottom: 0; right: 0; z-index: -1;
 }
+.favicon:not([src]) { display: none; }
 .favicon {
 	position: absolute; left: 50%; top: 50%; width: 20%; aspect-ratio: 1;
 	transform: translate(-50%, -50%);
@@ -44,22 +18,29 @@ SVG { display: block; }
 )
 
 const defaults = {
-	margin: 1,
-	cellsize: 1,
-	url: document.baseURI,
+	data: document.baseURI,
 	correction: 'M',
-	cellfn: squareFn,
+	margin: 1,
+	icon: false,
+	modulefn: moduleFn.square,
 }
 
-const template = modules =>
+const template = modules => //html
 `<div class='wrap'>
 <slot name='background'><div class='bg'></div></slot>
 ${modules}
 <slot name='overlay'><img class='favicon' /></slot>
 </div>`
 
-export default class HTMLQrCodeElement extends HTMLElement {
-	static observedAttributes = ['margin', 'cellsize', 'url', 'correction', 'cellfn']
+
+export class YACQrCodeComponent extends HTMLElement {
+	static observedAttributes = [
+		'data',
+		'correction',
+		'margin',
+		'icon',
+		'modulefn',
+	]
 	#state = { ...defaults }
 	
 	constructor() {
@@ -73,17 +54,19 @@ export default class HTMLQrCodeElement extends HTMLElement {
 	attributeChangedCallback($a, oldValue, newValue) {
 		if(newValue === null) this.#state[$a] = defaults[$a]
 		else switch($a) {
-			case 'margin':
-			case 'cellsize':
-				this.#state[$a] = Number.parseFloat(newValue)
-			break
-			case 'url':
+			case 'data':
 				this.#state[$a] = newValue
 			break
 			case 'correction':
 				this.#state[$a] = newValue.toUpperCase()
 			break
-			case 'cellfn':
+			case 'margin':
+				this.#state[$a] = Number.parseFloat(newValue)
+			break
+			case 'icon':
+				this.#state[$a] = this.hasAttribute('icon')
+			break
+			case 'modulefn':
 				this.#state[$a] = new Function(`return ${newValue}`)()
 			break
 		}
@@ -92,37 +75,38 @@ export default class HTMLQrCodeElement extends HTMLElement {
 	}
 	
 	render() {
-		const { url, correction, margin, cellsize, cellfn } = this.#state
+		const { data, correction, margin, icon, modulefn } = this.#state
 
 		const qr = new qrcode(0, correction)
-		qr.addData(url)
+		qr.addData(data)
 		qr.make()
 		
 		const moduleCount = qr.getModuleCount()
 		
-		const sideLength = moduleCount * cellsize + margin*2
+		const sideLength = moduleCount + margin*2
 		
-		const cells = []
+		const modules = []
 		for(let Y = 0; Y < moduleCount; ++Y)
 		for(let X = 0; X < moduleCount; ++X)
 		if(qr.isDark(Y, X))
-			cells.push(cellfn(X * cellsize + margin, Y * cellsize + margin, cellsize))
+			modules.push(modulefn(X, Y, margin, modules))
 		
-		const svgTemplate = `<svg
+		const svgTemplate = //svg
+		`<svg
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"
 			viewBox="0 0 ${sideLength} ${sideLength}"
 			preserveAspectRatio="xMinYMin meet"
-		>${cells.join('')}</svg>`
+		>${modules.join('')}</svg>`
 		
 		this.shadowRoot.innerHTML = template(svgTemplate)
 
 		const svg = this.shadowRoot.querySelector('svg')
 
 		const favicon = this.shadowRoot.querySelector('.favicon')
-		const domain = new URL(url).hostname
-		if(favicon && domain !== 'localhost') {
+		const domain = new URL(data).hostname
+		if(icon && favicon && domain !== 'localhost') {
 			const src = `http://www.google.com/s2/favicons?domain=${domain}&sz=64`
 			favicon.src = src
 
@@ -147,4 +131,5 @@ export default class HTMLQrCodeElement extends HTMLElement {
 		}
 	}
 }
-customElements.define('yac-qrcode', HTMLQrCodeElement)
+
+customElements.define('yac-qrcode', YACQrCodeComponent)
