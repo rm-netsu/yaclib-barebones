@@ -54,4 +54,4 @@ Function arguments:
 
 Function must return the module as a rendered SVG part.
 
-![./module-fn.js](Function samples)
+[Function samples](module-fn.js)
