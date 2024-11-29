@@ -113,7 +113,6 @@ export class YACQrCodeComponent extends HTMLElement {
 			favicon.onload = () => {
 				const iconRect = favicon.getBoundingClientRect()
 				const els = [...svg.querySelectorAll('*')]
-				console.log(els)
 
 				els.forEach(el => {
 					const rect = el.getBoundingClientRect()
