@@ -6,8 +6,8 @@ import * as moduleFn from './module-fn.js'
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(//css
 `SVG { display: block; }
-.wrap { position: relative; }
-.bg {
+.wrapper { position: relative; }
+.background-fill {
 	background: var(--bg, white);
 	position: absolute; left: 0; top: 0; bottom: 0; right: 0; z-index: -1;
 }
@@ -27,22 +27,38 @@ const defaults = {
 	modulefn: moduleFn.square,
 }
 
-const template = modules => //html
-`<div class='wrap'>
-<slot name='background'><div class='bg'></div></slot>
-${modules}
-<slot name='overlay'><yac-favicon ></yac-favicon></slot>
-</div>`
-
 
 export class YACQrCodeComponent extends HTMLElement {
 	static observedAttributes = Object.keys(defaults)
 	#state = { ...defaults }
+	#svg; #favicon
 	
 	constructor() {
 		super()
 		this.attachShadow({ mode: 'open' })
 		this.shadowRoot.adoptedStyleSheets = [sheet]
+
+		const wrapper = document.createElement('div')
+		wrapper.className = 'wrapper'
+			const background = document.createElement('slot')
+			background.name = 'background'
+				const bgFill = document.createElement('div')
+				bgFill.className = 'background-fill'
+				background.append(bgFill)
+			
+			this.#svg = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'svg'
+			)
+			this.#svg.setAttribute('preserveAspectRatio', 'xMinYMin meet')
+			
+			const overlay = document.createElement('slot')
+			overlay.name = 'overlay'
+				this.#favicon = new YACFaviconComponent()
+				overlay.append(this.#favicon)
+
+			wrapper.append(background, this.#svg, overlay)
+		this.shadowRoot.append(wrapper)
 		
 		this.render()
 	}
@@ -96,25 +112,14 @@ export class YACQrCodeComponent extends HTMLElement {
 		for(let X = 0; X < moduleCount; ++X)
 		if(qr.isDark(Y, X))
 			modules.push(modulefn(X, Y, margin, modules))
-		
-		const svgTemplate = //svg
-		`<svg
-			version="1.1"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlns:xlink="http://www.w3.org/1999/xlink"
-			viewBox="0 0 ${sideLength} ${sideLength}"
-			preserveAspectRatio="xMinYMin meet"
-		>${modules.join('')}</svg>`
-		
-		this.shadowRoot.innerHTML = template(svgTemplate)
 
-		const svg = this.shadowRoot.querySelector('svg')
+		this.#svg.setAttribute('viewBox', `0 0 ${sideLength} ${sideLength}`)
+		this.#svg.innerHTML = modules.join('')
 
 		if(icon) {
-			const favicon = this.shadowRoot.querySelector('yac-favicon')
-			favicon.onload = () => {
-				const iconRect = favicon.getBoundingClientRect()
-				const els = [...svg.querySelectorAll('*')]
+			this.#favicon.onload = () => {
+				const iconRect = this.#favicon.getBoundingClientRect()
+				const els = [...this.#svg.querySelectorAll('*')]
 
 				els.forEach(el => {
 					const rect = el.getBoundingClientRect()
@@ -129,8 +134,8 @@ export class YACQrCodeComponent extends HTMLElement {
 					) el.remove()
 				})
 			}
-			favicon.setAttribute('url', data)
-			favicon.setAttribute('size', iconSize)
+			this.#favicon.setAttribute('url', data)
+			this.#favicon.setAttribute('size', iconSize)
 		}
 	}
 }
