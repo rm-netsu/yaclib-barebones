@@ -1,4 +1,5 @@
 import qrcode from 'qrcode-generator-es6'
+import { YACFaviconComponent } from '../favicon/index.js'
 import * as moduleFn from './module-fn.js'
 
 
@@ -10,8 +11,8 @@ sheet.replaceSync(//css
 	background: var(--bg, white);
 	position: absolute; left: 0; top: 0; bottom: 0; right: 0; z-index: -1;
 }
-.favicon:not([src]) { display: none; }
-.favicon {
+yac-favicon:not([url]) { display: none; }
+yac-favicon {
 	position: absolute; left: 50%; top: 50%; width: 20%; aspect-ratio: 1;
 	transform: translate(-50%, -50%);
 }`
@@ -22,6 +23,7 @@ const defaults = {
 	correction: 'M',
 	margin: 1,
 	icon: false,
+	iconSize: 64,
 	modulefn: moduleFn.square,
 }
 
@@ -29,18 +31,12 @@ const template = modules => //html
 `<div class='wrap'>
 <slot name='background'><div class='bg'></div></slot>
 ${modules}
-<slot name='overlay'><img class='favicon' /></slot>
+<slot name='overlay'><yac-favicon ></yac-favicon></slot>
 </div>`
 
 
 export class YACQrCodeComponent extends HTMLElement {
-	static observedAttributes = [
-		'data',
-		'correction',
-		'margin',
-		'icon',
-		'modulefn',
-	]
+	static observedAttributes = Object.keys(defaults)
 	#state = { ...defaults }
 	
 	constructor() {
@@ -66,6 +62,9 @@ export class YACQrCodeComponent extends HTMLElement {
 			case 'icon':
 				this.#state[$a] = this.hasAttribute('icon')
 			break
+			case 'iconSize':
+				this.#state[$a] = Number.parseInt(newValue)
+			break
 			case 'modulefn':
 				this.#state[$a] = new Function(`return ${newValue}`)()
 			break
@@ -75,7 +74,14 @@ export class YACQrCodeComponent extends HTMLElement {
 	}
 	
 	render() {
-		const { data, correction, margin, icon, modulefn } = this.#state
+		const {
+			data,
+			correction,
+			margin,
+			icon,
+			iconSize,
+			modulefn,
+		} = this.#state
 
 		const qr = new qrcode(0, correction)
 		qr.addData(data)
@@ -104,12 +110,8 @@ export class YACQrCodeComponent extends HTMLElement {
 
 		const svg = this.shadowRoot.querySelector('svg')
 
-		const favicon = this.shadowRoot.querySelector('.favicon')
-		const domain = new URL(data).hostname
-		if(icon && favicon && domain !== 'localhost') {
-			const src = `http://www.google.com/s2/favicons?domain=${domain}&sz=64`
-			favicon.src = src
-
+		if(icon) {
+			const favicon = this.shadowRoot.querySelector('yac-favicon')
 			favicon.onload = () => {
 				const iconRect = favicon.getBoundingClientRect()
 				const els = [...svg.querySelectorAll('*')]
@@ -127,6 +129,8 @@ export class YACQrCodeComponent extends HTMLElement {
 					) el.remove()
 				})
 			}
+			favicon.setAttribute('url', data)
+			favicon.setAttribute('size', iconSize)
 		}
 	}
 }

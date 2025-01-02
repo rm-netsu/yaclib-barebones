@@ -40,3 +40,4 @@ If you do not want to import entire YACLib, you can import individual components
 
 Currently available components:
 - [QR code](qrcode/index.md)
+- [Favicon](favicon/index.md)

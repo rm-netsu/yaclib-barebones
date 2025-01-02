@@ -2,7 +2,7 @@
 ```html
 <script
 	type="module"
-	src="https://rm-netsu.github.io/yaclib-barebones/qrcode.js"
+	src="https://rm-netsu.github.io/yaclib-barebones/qrcode/index.js"
 ></script>
 ```
 
@@ -15,7 +15,7 @@ Minimal, contains URL of the page where it placed:
 Basic usage:
 ```html
 <yac-qrcode
-	url='https://developer.mozilla.org/en-US/docs/Web/HTML'
+	data='https://developer.mozilla.org/en-US/docs/Web/HTML'
 	correction='H'
 	margin='2'
 	icon
@@ -25,7 +25,7 @@ Basic usage:
 With custom background and overlay:
 ```html
 <yac-qrcode
-	url='https://developer.mozilla.org/en-US/docs/Web/HTML'
+	data='https://developer.mozilla.org/en-US/docs/Web/HTML'
 	margin='2'
 >
 	<div slot='background'> your custom background </div>
@@ -39,6 +39,7 @@ With custom background and overlay:
 - **correction**: error correction level. *Default: M*
 - **margin**: margin of QR code in modules. *Default: 1*
 - **icon**: enables rendering of site favicon for URL in `data` attribute.
+- **iconSize**: size of favicon if rendered. *Default: 64*
 - **modulefn**: see "Advanced usage" section.
 
 ### Advanced usage:
