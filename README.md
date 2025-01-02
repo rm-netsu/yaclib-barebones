@@ -1,9 +1,9 @@
-# YACLib (barebones version)
-YACLib (Yet Another Component Library) is a collection of web components.
-This repo contains *barebones* version written as native ES6 modules.
+# YACLib (Yet Another Component Library)
+Collection of web components written as native ES6 modules.
 (To be rewritten in TypeScript later.)
 
-To use on your page, you should add the following code into your `<head>` tag:
+## Basic usage:
+Add the following code into `<head>` tag of your page:
 ```html
 <!-- add importmap before any module imports -->
 <script type="importmap">
